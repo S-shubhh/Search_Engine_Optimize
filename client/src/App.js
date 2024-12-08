@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 const App = () => {
   const [decryptedMessage, setDecryptedMessage] = useState("");
+  const [userMessage, setUserMessage] = useState("");
 
   const encryptData = async (data) => {
     // Fetch the public key
@@ -41,8 +42,12 @@ const App = () => {
   };
 
   const handleEncryptAndSend = async () => {
-    const secretMessage = "This is a secret message!";
-    const encryptedData = await encryptData(secretMessage);
+    if (!userMessage) {
+      alert("Please enter a message!");
+      return;
+    }
+
+    const encryptedData = await encryptData(userMessage);
 
     console.log("Encrypted Data:", encryptedData);
 
@@ -60,6 +65,12 @@ const App = () => {
   return (
     <div>
       <h1>End-to-End Encryption</h1>
+      <input
+        type="text"
+        placeholder="Enter your message"
+        value={userMessage}
+        onChange={(e) => setUserMessage(e.target.value)}
+      />
       <button onClick={handleEncryptAndSend}>Encrypt and Send</button>
       <p>Decrypted Message: {decryptedMessage}</p>
     </div>
