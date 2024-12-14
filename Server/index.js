@@ -2,6 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const crypto = require("crypto");
 const cors = require("cors");
+const axios = require("axios"); // For making API requests
 
 const app = express();
 app.use(express.json());
@@ -10,45 +11,64 @@ app.use(cors());
 // Load RSA private key
 const privateKey = fs.readFileSync("keys/private_key.pem", "utf8");
 
-// API to decrypt data
-app.post("/decrypt", (req, res) => {
+// Google Custom Search API configuration
+const GOOGLE_SEARCH_API_KEY = "AIzaSyCEJokxuLLNV-6o_nthbc1wCPS2QNIx2y0"; // Replace with your actual API key
+const GOOGLE_SEARCH_ENGINE_ID = "85d9b2239a4cc4bbf"; // Replace with your actual search engine ID
+
+// Decrypt function to handle encrypted queries
+const decryptQuery = (encryptedQuery) => {
+  const encryptedBuffer = Buffer.from(encryptedQuery, "base64");
+  const decryptedBuffer = crypto.privateDecrypt(
+    {
+      key: privateKey,
+      padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+      oaepHash: "sha256",
+    },
+    encryptedBuffer
+  );
+  return decryptedBuffer.toString("utf8");
+};
+
+// API to handle search queries
+app.post("/api/search", async (req, res) => {
   try {
-    const { encryptedData } = req.body;
-    if (!encryptedData) {
-      return res.status(400).json({ error: "No encrypted data provided." });
+    const { encryptedQuery } = req.body;
+    if (!encryptedQuery) {
+      return res.status(400).json({ error: "No encrypted query provided." });
     }
 
-    console.log("Encrypted Data Received:", encryptedData);
+    console.log("Encrypted Query Received:", encryptedQuery);
 
-    // Decrypt data using the private key
-    const encryptedBuffer = Buffer.from(encryptedData, "base64");
-    const decryptedBuffer = crypto.privateDecrypt(
-      {
-        key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        oaepHash: "sha256",
+    // Decrypt the query
+    const decryptedQuery = decryptQuery(encryptedQuery);
+    console.log("Decrypted Query:", decryptedQuery);
+
+    // Use Google Custom Search API to get results
+    const response = await axios.get("https://www.googleapis.com/customsearch/v1", {
+      params: {
+        key: GOOGLE_SEARCH_API_KEY,
+        cx: GOOGLE_SEARCH_ENGINE_ID,
+        q: decryptedQuery,
       },
-      encryptedBuffer
-    );
+    });
 
-    const decryptedData = decryptedBuffer.toString("utf8");
-    console.log("Decrypted Data:", decryptedData);
+    // Send results back to the client
+    const results = response.data.items.map((item) => ({
+      title: item.title,
+      link: item.link,
+      snippet: item.snippet,
+    }));
 
-    res.json({ message: "Decryption successful", data: decryptedData });
+    console.log("Search Results:", results);
+
+    res.json({
+      message: "Search successful",
+      query: decryptedQuery,
+      results,
+    });
   } catch (error) {
-    console.error("Error decrypting data:", error);
-    res.status(500).json({ error: "Failed to decrypt data" });
-  }
-});
-
-// Serve public key to the client
-app.get("/public_key.pem", (req, res) => {
-  try {
-    const publicKey = fs.readFileSync("keys/public_key.pem", "utf8");
-    res.type("text/plain").send(publicKey);
-  } catch (error) {
-    console.error("Error fetching public key:", error);
-    res.status(500).send("Failed to fetch public key");
+    console.error("Error processing search:", error);
+    res.status(500).json({ error: "Failed to process search query" });
   }
 });
 
