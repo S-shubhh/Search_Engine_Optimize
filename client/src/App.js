@@ -1,30 +1,32 @@
 import React, { useState } from "react";
-import './index.css';
-import * as crypto from "crypto"; // Make sure to import crypto for encryption
+import "./index.css";
+import forge from "node-forge"; // Import node-forge for RSA encryption
 
 const App = () => {
   const [query, setQuery] = useState(""); // State to hold the user input
   const [searchResults, setSearchResults] = useState([]); // To store search results
   const [metadata, setMetadata] = useState({}); // To store location metadata
 
-  // Encrypt the query
+  // Encrypt the query using RSA
   const encryptQuery = (query) => {
-    const publicKey = `YOUR_PUBLIC_KEY_HERE`; // Replace with your public key
-    const buffer = Buffer.from(query, "utf8");
+    const publicKeyPem = process.env.REACT_APP_PUBLIC_KEY; // Replace with your actual public key
 
-    const encrypted = crypto.publicEncrypt(
-      {
-        key: publicKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        oaepHash: "sha256",
-      },
-      buffer
-    );
-    return encrypted.toString("base64");
+        if (!publicKeyPem) {
+          console.error("Public key not found. Make sure the .env file is configured correctly.");
+        }
+
+
+        const formattedKey = publicKeyPem.replace(/\\n/g, '\n').replace(/\\r/g, '');
+    const publicKey = forge.pki.publicKeyFromPem(formattedKey);
+    const encrypted = publicKey.encrypt(query, "RSA-OAEP", {
+      md: forge.md.sha256.create(), // Use SHA-256 hashing for OAEP
+    });
+
+    return forge.util.encode64(encrypted); // Convert encrypted data to Base64
   };
 
   const handleSearch = async () => {
-    if (!query) return; // Check if there's a query to send
+    if (!query) return; // Ensure there's a query to send
 
     // Encrypt the query before sending
     const encryptedQuery = encryptQuery(query);
@@ -43,9 +45,9 @@ const App = () => {
         // Update state with results and metadata
         setSearchResults(data.results);
         setMetadata({
-          nearestStation: "XYZ Railway Station", // Mocked data
-          nearestAirport: "ABC International Airport", // Mocked data
-          famousFor: "Historic Temples", // Mocked data
+          nearestStation: data.metadata?.nearestStation || "N/A",
+          nearestAirport: data.metadata?.nearestAirport || "N/A",
+          famousFor: data.metadata?.famousFor || "N/A",
         });
       } else {
         console.error("Error fetching search results:", data.error);

@@ -2,9 +2,13 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+   
+"scripts": { 
+  "start": "react-app-rewired start", 
+  "build": "react-app-rewired build", 
+  "test": "react-app-rewired test", 
+  "eject": "react-scripts eject" 
+ },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -13,6 +17,7 @@
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "css-loader": "^7.1.2",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "style-loader": "^4.0.0"
   }

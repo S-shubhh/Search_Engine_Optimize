@@ -4,16 +4,16 @@
   "private": true,
   "dependencies": {
     "cra-template": "1.2.0",
-    "crypto-browserify": "^3.12.1",
+    "crypto-js": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -36,8 +36,18 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
+    "assert": "^2.1.0",
     "autoprefixer": "^10.4.20",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.16"
+    "process": "^0.11.10",
+    "react-app-rewired": "^2.2.1",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "tailwindcss": "^3.4.16",
+    "url": "^0.11.4"
   }
 }

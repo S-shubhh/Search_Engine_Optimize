@@ -9,3 +9,5 @@ server/keys/
 # Optionally ignore any build or temporary files (example)
 node_modules/
 
+.env
+
