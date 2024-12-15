@@ -3,6 +3,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 const cors = require("cors");
 const axios = require("axios"); // For making API requests
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
