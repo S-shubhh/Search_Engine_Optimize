@@ -12,8 +12,8 @@ app.use(cors());
 const privateKey = fs.readFileSync("keys/private_key.pem", "utf8");
 
 // Google Custom Search API configuration
-const GOOGLE_SEARCH_API_KEY = "AIzaSyCEJokxuLLNV-6o_nthbc1wCPS2QNIx2y0"; // Replace with your actual API key
-const GOOGLE_SEARCH_ENGINE_ID = "85d9b2239a4cc4bbf"; // Replace with your actual search engine ID
+const GOOGLE_SEARCH_API_KEY = process.env.GOOGLE_SEARCH_API_KEY; // Replace with your actual API key
+const GOOGLE_SEARCH_ENGINE_ID = process.env.GOOGLE_SEARCH_ENGINE_ID; // Replace with your actual search engine ID
 
 // Decrypt function to handle encrypted queries
 const decryptQuery = (encryptedQuery) => {
