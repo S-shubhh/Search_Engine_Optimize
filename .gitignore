@@ -1,9 +1,9 @@
 # Ignore the client/public folder containing sensitive keys
-client/public/
+
 
 
 # Ignore the server/keys folder containing sensitive private keys
-server/keys/
+
 
 
 # Optionally ignore any build or temporary files (example)
