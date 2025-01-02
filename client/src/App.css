@@ -1,53 +1,64 @@
-/* app.css */
-
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
-  height: 100vh;
-  justify-content: center;
-}
-
+/* App.css */
 .header {
-  color: #333;
+  text-align: center;
   font-size: 2rem;
   margin-bottom: 20px;
+  color: #333;
 }
 
 .input {
+  width: 100%;
   padding: 10px;
-  width: 300px;
-  font-size: 1rem;
-  margin-bottom: 20px;
-  border-radius: 5px;
+  margin-bottom: 15px;
   border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
 }
 
 .button {
+  background-color: #007bff;
+  color: #fff;
   padding: 10px 20px;
-  font-size: 1rem;
-  background-color: #007BFF;
-  color: white;
   border: none;
   border-radius: 5px;
+  font-size: 1rem;
   cursor: pointer;
-  width: 150px;
 }
 
-.button:disabled {
-  background-color: #d6d6d6;
-  cursor: not-allowed;
+.button:hover {
+  background-color: #0056b3;
 }
 
 .result-container {
   margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  background-color: #e9f7ff;
 }
 
 .decrypted-message {
-  color: green;
+  color: #007bff;
+  font-size: 1.2rem;
+}
+
+.google-data {
+  margin-top: 20px;
+}
+
+.google-data h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.google-data ul {
+  list-style: none;
+  padding: 0;
+}
+
+.google-data li {
+  margin-bottom: 10px;
   font-size: 1rem;
-  font-weight: bold;
+  color: #555;
 }
