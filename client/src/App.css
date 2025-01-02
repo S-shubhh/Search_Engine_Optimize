@@ -1,64 +1,110 @@
-/* App.css */
-.header {
+body {
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+  color: #333;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.search-container {
   text-align: center;
-  font-size: 2rem;
   margin-bottom: 20px;
-  color: #333;
 }
 
-.input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
-}
-
-.button {
-  background-color: #007bff;
+.app-title {
+  font-size: 2.5rem;
   color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.button:hover {
-  background-color: #0056b3;
-}
-
-.result-container {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #007bff;
-  border-radius: 5px;
-  background-color: #e9f7ff;
-}
-
-.decrypted-message {
-  color: #007bff;
-  font-size: 1.2rem;
-}
-
-.google-data {
-  margin-top: 20px;
-}
-
-.google-data h2 {
-  color: #333;
-  font-size: 1.5rem;
   margin-bottom: 10px;
 }
 
-.google-data ul {
+.search-input {
+  width: 80%;
+  max-width: 500px;
+  padding: 10px;
+  font-size: 1.2rem;
+  border: 2px solid #fff;
+  border-radius: 25px;
+  outline: none;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-input:focus {
+  border-color: #ffa500;
+}
+
+.search-button {
+  background-color: #ff6347;
+  color: #fff;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #e5533c;
+}
+
+.results-section {
+  display: flex;
+  width: 80%;
+  max-width: 1200px;
+  gap: 20px;
+}
+
+.google-results,
+.metadata {
+  flex: 1;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.google-results h2,
+.metadata h2 {
+  margin-bottom: 10px;
+  color: #ff6347;
+}
+
+.google-results ul {
   list-style: none;
   padding: 0;
 }
 
-.google-data li {
+.google-item {
   margin-bottom: 10px;
-  font-size: 1rem;
+}
+
+.google-item h3 {
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+.google-item h3:hover {
+  text-decoration: underline;
+}
+
+.google-item p {
+  margin: 5px 0;
   color: #555;
+}
+
+.metadata h3 {
+  margin-bottom: 5px;
+}
+
+.metadata ul {
+  list-style: none;
+  padding: 0;
 }

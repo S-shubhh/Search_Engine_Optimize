@@ -1,110 +1,135 @@
 import React, { useState } from "react";
-import './App.css'; // Importing the app-specific styles
+import "./App.css";
 
 const App = () => {
-  const [decryptedMessage, setDecryptedMessage] = useState("");
-  const [userMessage, setUserMessage] = useState("");
-  const [loading, setLoading] = useState(false); // State to track loading status
+  const [searchQuery, setSearchQuery] = useState("");
+  const [metadata, setMetadata] = useState(null);
+  const [googleResults, setGoogleResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const encryptData = async (data) => {
-    try {
-      console.log("Starting encryption...");
-
-      // Fetch the public key
-      const publicKeyResponse = await fetch("/public_key.pem");
-      const publicKeyPem = await publicKeyResponse.text();
-
-      // Convert PEM format to ArrayBuffer
-      const publicKeyBase64 = publicKeyPem
-        .replace("-----BEGIN PUBLIC KEY-----", "")
-        .replace("-----END PUBLIC KEY-----", "")
-        .replace(/\n/g, "");
-      const publicKeyArrayBuffer = Uint8Array.from(
-        atob(publicKeyBase64),
-        (c) => c.charCodeAt(0)
-      );
-
-      // Import the public key
-      const cryptoKey = await crypto.subtle.importKey(
-        "spki",
-        publicKeyArrayBuffer.buffer,
-        {
-          name: "RSA-OAEP",
-          hash: { name: "SHA-256" },
-        },
-        false,
-        ["encrypt"]
-      );
-
-      // Encrypt the data
-      const encryptedBuffer = await crypto.subtle.encrypt(
-        { name: "RSA-OAEP" },
-        cryptoKey,
-        new TextEncoder().encode(data)
-      );
-
-      const encryptedData = btoa(String.fromCharCode(...new Uint8Array(encryptedBuffer)));
-      console.log("Encrypted Data:", encryptedData);
-      return encryptedData;
-    } catch (error) {
-      console.error("Encryption failed:", error);
-      alert("Encryption failed. Please try again.");
-    }
-  };
-
-  const handleEncryptAndSend = async () => {
-    if (!userMessage) {
-      alert("Please enter a message!");
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      alert("Please enter a search query!");
       return;
     }
 
-    setLoading(true); // Show loading spinner during the request
-
-    const encryptedData = await encryptData(userMessage);
-    if (!encryptedData) return;
+    setLoading(true);
 
     try {
-      console.log("Sending encrypted data to server...");
+      // Fetch metadata
+      const metadataResponse = await fetch(
+        `http://localhost:5000/metadata?query=${encodeURIComponent(searchQuery)}`
+      );
+      const metadataData = await metadataResponse.json();
+      setMetadata(metadataData.data);
 
-      // Send the encrypted data to the server
-      const response = await fetch("http://localhost:5000/decrypt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ encryptedData }),
-      });
-
-      const result = await response.json();
-      setDecryptedMessage(result.data);
-      console.log("Server Response:", result);
+      // Fetch Google search results
+      const googleResponse = await fetch(
+        `http://localhost:5000/googleSearch?query=${encodeURIComponent(searchQuery)}`
+      );
+      const googleData = await googleResponse.json();
+      setGoogleResults(googleData.data || []);
     } catch (error) {
-      console.error("Request failed:", error);
-      alert("Failed to send request. Please try again.");
+      console.error("Failed to fetch data:", error);
+      alert("Failed to fetch data. Please try again.");
     } finally {
-      setLoading(false); // Hide loading spinner after the request
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container">
-      <h1 className="header">End-to-End Encryption</h1>
-      <input
-        type="text"
-        placeholder="Enter your message"
-        value={userMessage}
-        onChange={(e) => setUserMessage(e.target.value)}
-        className="input"
-      />
-      <button
-        onClick={handleEncryptAndSend}
-        className="button"
-        disabled={loading}
-      >
-        {loading ? "Encrypting..." : "Encrypt and Send"}
-      </button>
-      <div className="result-container">
-        {decryptedMessage && (
-          <p className="decrypted-message">Decrypted Message: {decryptedMessage}</p>
-        )}
+    <div className="app">
+      <div className="search-container">
+        <h1 className="app-title">Discover Places</h1>
+        <input
+          type="text"
+          placeholder="Search for a place"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+        <button
+          onClick={handleSearch}
+          className="search-button"
+          disabled={loading}
+        >
+          {loading ? "Searching..." : "Search"}
+        </button>
+      </div>
+
+      <div className="results-section">
+        {/* Google search results */}
+        <div className="google-results">
+          <h2>Related Sites</h2>
+          {googleResults.length > 0 ? (
+            <ul>
+              {googleResults.map((result, index) => (
+                <li key={index} className="google-item">
+                  <a href={result.link} target="_blank" rel="noopener noreferrer">
+                    <h3>{result.title}</h3>
+                  </a>
+                  <p>{result.snippet}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No related sites found.</p>
+          )}
+        </div>
+
+        {/* Metadata section */}
+        <div className="metadata">
+          <h2>Metadata</h2>
+          {metadata ? (
+            <div>
+              <h3>{metadata.name}</h3>
+              <p>{metadata.address}</p>
+              <p>
+                <strong>Why Famous:</strong> {metadata.whyFamous}
+              </p>
+
+              {/* Nearby stations and airports */}
+              <h4>Nearby:</h4>
+              <ul>
+                <li>
+                  <strong>Railway Station:</strong>
+                  {metadata.nearby.railwayStation.length > 0
+                    ? metadata.nearby.railwayStation.map((station, index) => (
+                        <div key={index}>
+                          <p>{station.name}</p>
+                          <p>{station.distance}</p>
+                        </div>
+                      ))
+                    : "N/A"}
+                </li>
+                <li>
+                  <strong>Bus Station:</strong>
+                  {metadata.nearby.busStation.length > 0
+                    ? metadata.nearby.busStation.map((station, index) => (
+                        <div key={index}>
+                          <p>{station.name}</p>
+                          <p>{station.distance}</p>
+                        </div>
+                      ))
+                    : "N/A"}
+                </li>
+                <li>
+                  <strong>Airport:</strong>
+                  {metadata.nearby.airport.length > 0
+                    ? metadata.nearby.airport.map((airport, index) => (
+                        <div key={index}>
+                          <p>{airport.name}</p>
+                          <p>{airport.distance}</p>
+                        </div>
+                      ))
+                    : "N/A"}
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <p>No metadata available.</p>
+          )}
+        </div>
       </div>
     </div>
   );
