@@ -1,13 +1,3 @@
-# Ignore the client/public folder containing sensitive keys
-
-
-
-# Ignore the server/keys folder containing sensitive private keys
-
-
-
-
-# Optionally ignore any build or temporary files (example)
 node_modules/
 keys/
 .env
