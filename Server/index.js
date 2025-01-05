@@ -48,6 +48,32 @@ app.post("/decrypt", (req, res) => {
   }
 });
 
+app.get("/googleSearch", async (req, res) => {
+  try {
+    const { query } = req.query;
+    if (!query) {
+      return res.status(400).json({ error: "Query parameter is required" });
+    }
+
+    const apiKey = process.env.GOOGLE_SEARCH_API_KEY;
+    const cx = process.env.GOOGLE_SEARCH_ENGINE_ID;
+    const encodedQuery = encodeQuery(query);
+
+    const response = await axios.get(
+      `https://www.googleapis.com/customsearch/v1?q=${encodedQuery}&key=${apiKey}&cx=${cx}`
+    );
+    const results = response.data.items.map((item) => ({
+      title: item.title,
+      link: item.link,
+      snippet: item.snippet,
+    }));
+
+    res.json({ message: "Google search results fetched", data: results });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch Google search results", details: error.message });
+  }
+});
+
 // Endpoint: Fetch metadata from Google Places API
 app.get("/metadata", async (req, res) => {
   try {
@@ -59,6 +85,7 @@ app.get("/metadata", async (req, res) => {
     const apiKey = process.env.GOOGLE_PLACES_API;
     const baseUrl = "https://maps.googleapis.com/maps/api/place/textsearch/json";
 
+    // Step 1: Fetch place details
     const metadataResponse = await axios.get(`${baseUrl}?query=${encodeURIComponent(query)}&key=${apiKey}`);
     const place = metadataResponse.data.results[0];
 
@@ -70,53 +97,45 @@ app.get("/metadata", async (req, res) => {
     const lat = geometry.location.lat;
     const lng = geometry.location.lng;
 
+    // Step 2: Fetch detailed place information
     const detailsResponse = await axios.get(
       `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${apiKey}`
     );
     const details = detailsResponse.data.result;
     const whyFamous = details.editorial_summary?.overview || "Details not available.";
 
+    // Step 3: Fetch nearby locations (train station, bus station, airport)
     const types = ["train_station", "bus_station", "airport"];
     const nearbyPromises = types.map((type) =>
       axios.get(
         `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=100000&type=${type}&key=${apiKey}`
       )
     );
-
     const nearbyResponses = await Promise.all(nearbyPromises);
 
     const nearby = {
-      railwayStation: nearbyResponses[0].data.results.slice(0, 3).map((r) => ({
+      railwayStation: nearbyResponses[0]?.data?.results.slice(0, 3).map((r) => ({
         name: r.name,
         address: r.vicinity,
         distance: calculateDistance(lat, lng, r.geometry.location.lat, r.geometry.location.lng).toFixed(2) + " km",
-      })),
-      busStation: nearbyResponses[1].data.results.slice(0, 3).map((r) => ({
+      })) || [],
+      busStation: nearbyResponses[1]?.data?.results.slice(0, 3).map((r) => ({
         name: r.name,
         address: r.vicinity,
         distance: calculateDistance(lat, lng, r.geometry.location.lat, r.geometry.location.lng).toFixed(2) + " km",
-      })),
-      airport: nearbyResponses[2].data.results
-        .filter((r) =>
-          r.types.includes("airport") &&
-          (
-            r.name.toLowerCase().includes("airport") ||
-            r.name.toLowerCase().includes("international")
-          )
-        )
+      })) || [],
+      airport: nearbyResponses[2]?.data?.results
+        .filter((r) => r.types.includes("airport"))
         .slice(0, 1)
         .map((r) => ({
           name: r.name,
           address: r.vicinity,
           distance: calculateDistance(lat, lng, r.geometry.location.lat, r.geometry.location.lng).toFixed(2) + " km",
-        })),
+        })) || [{ name: "No airports found nearby", address: "N/A", distance: "N/A" }],
     };
 
-    if (nearby.airport.length === 0) {
-      nearby.airport = [{ name: "No airports found nearby", address: "N/A", distance: "N/A" }];
-    }
-
-    const truncatedWhyFamous = whyFamous.length > 200 ? whyFamous.substring(0, 200) + "..." : whyFamous;
+    // Step 4: Truncate "Why Famous" if necessary
+    const truncatedWhyFamous = whyFamous.length > 200 ? `${whyFamous.substring(0, 200)}...` : whyFamous;
 
     res.json({
       message: "Metadata fetched successfully",
@@ -128,6 +147,7 @@ app.get("/metadata", async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error fetching metadata:", error);
     res.status(500).json({ error: "Failed to fetch metadata", details: error.message });
   }
 });

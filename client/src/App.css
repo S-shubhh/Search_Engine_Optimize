@@ -1,7 +1,7 @@
 body {
   margin: 0;
-  font-family: "Arial", sans-serif;
-  background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
   color: #333;
 }
 
@@ -20,39 +20,62 @@ body {
 
 .app-title {
   font-size: 2.5rem;
-  color: #fff;
+  color: #3c91e6;
   margin-bottom: 10px;
+}
+
+.search-bar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: #aaa;
 }
 
 .search-input {
   width: 80%;
   max-width: 500px;
-  padding: 10px;
+  padding: 10px 40px 10px 35px;
   font-size: 1.2rem;
-  border: 2px solid #fff;
+  border: 2px solid #ccc;
   border-radius: 25px;
   outline: none;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .search-input:focus {
-  border-color: #ffa500;
+  border-color: #3c91e6;
+  box-shadow: 0 0 5px rgba(60, 145, 230, 0.5);
 }
 
 .search-button {
-  background-color: #ff6347;
+  background-color: #3c91e6;
   color: #fff;
   font-size: 1rem;
   padding: 10px 20px;
   border: none;
   border-radius: 25px;
   cursor: pointer;
+  margin-left: 10px;
   transition: background-color 0.3s ease;
 }
 
 .search-button:hover {
-  background-color: #e5533c;
+  background-color: #2b7cc4;
+}
+
+.clear-button {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 1.2rem;
+  position: absolute;
+  right: 10px;
 }
 
 .results-section {
@@ -60,6 +83,14 @@ body {
   width: 80%;
   max-width: 1200px;
   gap: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.results-section.fade-in {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .google-results,
@@ -74,37 +105,5 @@ body {
 .google-results h2,
 .metadata h2 {
   margin-bottom: 10px;
-  color: #ff6347;
-}
-
-.google-results ul {
-  list-style: none;
-  padding: 0;
-}
-
-.google-item {
-  margin-bottom: 10px;
-}
-
-.google-item h3 {
-  font-size: 1.2rem;
-  color: #007bff;
-}
-
-.google-item h3:hover {
-  text-decoration: underline;
-}
-
-.google-item p {
-  margin: 5px 0;
-  color: #555;
-}
-
-.metadata h3 {
-  margin-bottom: 5px;
-}
-
-.metadata ul {
-  list-style: none;
-  padding: 0;
+  color: #3c91e6;
 }
