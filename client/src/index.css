@@ -6,8 +6,8 @@ body {
   background-color: #f4f4f4; /* Global background color */
 }
 
-.container {
-  margin: 0 auto;
-  max-width: 800px;
-  padding: 20px;
+* {
+  box-sizing: border-box; /* Ensure all elements are sized properly */
 }
+
+/* Removed container to prevent unnecessary width restrictions */

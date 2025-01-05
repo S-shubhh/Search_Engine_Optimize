@@ -32,6 +32,7 @@ const App = () => {
       const googleData = await googleResponse.json();
       setGoogleResults(googleData.data || []);
       setShowResults(true);
+
     } catch (error) {
       console.error("Failed to fetch data:", error);
       alert("Failed to fetch data. Please try again.");
@@ -43,6 +44,8 @@ const App = () => {
   const handleClear = () => {
     setSearchQuery("");
     setShowResults(false);
+    setGoogleResults([]);
+    setMetadata(null);
   };
 
   return (
@@ -50,7 +53,6 @@ const App = () => {
       <div className="search-container">
         <h1 className="app-title">Discover Places</h1>
         <div className="search-bar">
-          <i className="fa fa-search search-icon"></i>
           <input
             type="text"
             placeholder="Search for a place"
@@ -73,14 +75,14 @@ const App = () => {
         </div>
       </div>
 
-      {showResults && (
-        <div className="results-section">
-          <div className="google-results fade-in">
-            <h2>Related Sites</h2>
-            {googleResults.length > 0 ? (
+      <div className={`results-section ${showResults ? "visible" : ""}`}>
+        {googleResults.length > 0 && (
+          <div className="results-container">
+            <div className="google-results">
+              <h2>Related Sites</h2>
               <ul>
                 {googleResults.map((result, index) => (
-                  <li key={index} className="google-item">
+                  <li key={index}>
                     <a href={result.link} target="_blank" rel="noopener noreferrer">
                       <h3>{result.title}</h3>
                     </a>
@@ -88,15 +90,11 @@ const App = () => {
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p>No related sites found.</p>
-            )}
-          </div>
+            </div>
 
-          <div className="metadata fade-in">
-            <h2>Metadata</h2>
-            {metadata ? (
-              <div>
+            {metadata && (
+              <div className="metadata">
+                <h2>Metadata</h2>
                 <h3>{metadata.name}</h3>
                 <p>{metadata.address}</p>
                 <p>
@@ -104,48 +102,33 @@ const App = () => {
                 </p>
                 <h4>Nearby:</h4>
                 <ul>
-                  {metadata.nearby && (
-                    <>
-                      <li>
-                        <strong>Railway Station:</strong>{" "}
-                        {metadata.nearby.railwayStation.length
-                          ? metadata.nearby.railwayStation.map((station) => (
-                              <p key={station.name}>
-                                {station.name} - {station.distance}
-                              </p>
-                            ))
-                          : "N/A"}
-                      </li>
-                      <li>
-                        <strong>Bus Station:</strong>{" "}
-                        {metadata.nearby.busStation.length
-                          ? metadata.nearby.busStation.map((station) => (
-                              <p key={station.name}>
-                                {station.name} - {station.distance}
-                              </p>
-                            ))
-                          : "N/A"}
-                      </li>
-                      <li>
-                        <strong>Airport:</strong>{" "}
-                        {metadata.nearby.airport.length
-                          ? metadata.nearby.airport.map((airport) => (
-                              <p key={airport.name}>
-                                {airport.name} - {airport.distance}
-                              </p>
-                            ))
-                          : "N/A"}
-                      </li>
-                    </>
-                  )}
+                  <li>
+                    <strong>Railway Station:</strong> {metadata.nearby.railwayStation.length
+                      ? metadata.nearby.railwayStation.map((station) => (
+                          <p key={station.name}>{station.name} - {station.distance}</p>
+                        ))
+                      : "N/A"}
+                  </li>
+                  <li>
+                    <strong>Bus Station:</strong> {metadata.nearby.busStation.length
+                      ? metadata.nearby.busStation.map((station) => (
+                          <p key={station.name}>{station.name} - {station.distance}</p>
+                        ))
+                      : "N/A"}
+                  </li>
+                  <li>
+                    <strong>Airport:</strong> {metadata.nearby.airport.length
+                      ? metadata.nearby.airport.map((airport) => (
+                          <p key={airport.name}>{airport.name} - {airport.distance}</p>
+                        ))
+                      : "N/A"}
+                  </li>
                 </ul>
               </div>
-            ) : (
-              <p>No metadata available.</p>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

@@ -1,15 +1,16 @@
+/* Global Styles */
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
 }
 
 .app {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  min-height: 100vh;
   padding: 20px;
 }
 
@@ -28,12 +29,6 @@ body {
   position: relative;
   display: inline-flex;
   align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: 10px;
-  color: #aaa;
 }
 
 .search-input {
@@ -61,11 +56,6 @@ body {
   border-radius: 25px;
   cursor: pointer;
   margin-left: 10px;
-  transition: background-color 0.3s ease;
-}
-
-.search-button:hover {
-  background-color: #2b7cc4;
 }
 
 .clear-button {
@@ -79,31 +69,73 @@ body {
 }
 
 .results-section {
-  display: flex;
-  width: 80%;
-  max-width: 1200px;
-  gap: 20px;
+  width: 100%;
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.results-section.fade-in {
+.results-section.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.google-results,
-.metadata {
-  flex: 1;
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+/* This section holds both metadata and Google results side by side */
+.results-container {
+  display: flex;
+  gap: 20px;  /* Adjusts space between two containers */
+  width: 100%;
+  justify-content: space-between;
 }
 
-.google-results h2,
-.metadata h2 {
-  margin-bottom: 10px;
+.google-results,
+.metadata {
+  background-color: #fff;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  flex: 1; /* Equal flex for both */
+}
+
+.google-results {
+  margin-right: 20px; /* Adds space between metadata and results */
+}
+
+.metadata {
+  margin-left: 20px; /* Adds space between metadata and results */
+}
+
+.metadata h2,
+.google-results h2 {
   color: #3c91e6;
+  margin-bottom: 10px;
+}
+
+.metadata ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.metadata li {
+  margin-bottom: 8px;
+}
+
+.metadata li p {
+  margin: 0;
+}
+
+.metadata::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #ddd;
+  margin-top: 20px;
+}
+
+.results-container .google-results {
+  border-right: 1px solid #ddd; /* Thin dividing line */
 }
