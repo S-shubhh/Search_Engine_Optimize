@@ -1,61 +1,81 @@
 /* Global Styles */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .app {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: 20px;
+  padding: 30px;
+  width: 100%;
+  max-width: 1200px;
+  box-sizing: border-box; /* Ensures padding doesn't affect overall width */
 }
 
 .search-container {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 
 .app-title {
-  font-size: 2.5rem;
-  color: #3c91e6;
-  margin-bottom: 10px;
+  font-size: 3rem;
+  color: #5d3f6a;
+  margin-bottom: 20px;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .search-bar {
   position: relative;
   display: inline-flex;
   align-items: center;
+  width: 100%;
+  max-width: 600px;
 }
 
 .search-input {
-  width: 80%;
-  max-width: 500px;
-  padding: 10px 40px 10px 35px;
+  width: 100%;
+  padding: 12px 40px;
   font-size: 1.2rem;
-  border: 2px solid #ccc;
+  border: 2px solid #ddd;
   border-radius: 25px;
   outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(to right, #ff7e5f, #feb47b); /* Gradient Background */
+  color: white;
 }
 
 .search-input:focus {
-  border-color: #3c91e6;
-  box-shadow: 0 0 5px rgba(60, 145, 230, 0.5);
+  border-color: #ff7e5f;
+  box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
 }
 
 .search-button {
-  background-color: #3c91e6;
-  color: #fff;
-  font-size: 1rem;
-  padding: 10px 20px;
+  background-color: #ff7e5f;
+  color: white;
+  font-size: 1.1rem;
+  padding: 12px 24px;
   border: none;
   border-radius: 25px;
   cursor: pointer;
-  margin-left: 10px;
+  margin-left: 15px;
+  transition: all 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #feb47b;
+  transform: translateY(-3px);
 }
 
 .clear-button {
@@ -63,9 +83,15 @@ body {
   border: none;
   color: #888;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   position: absolute;
   right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.clear-button:hover {
+  color: #ff7e5f;
 }
 
 .results-section {
@@ -80,62 +106,119 @@ body {
   transform: translateY(0);
 }
 
-/* This section holds both metadata and Google results side by side */
 .results-container {
   display: flex;
-  gap: 20px;  /* Adjusts space between two containers */
+  gap: 30px;
   width: 100%;
   justify-content: space-between;
+  margin-top: 20px;
+  box-sizing: border-box; /* Ensure no margin issue */
 }
 
-.google-results,
-.metadata {
-  background-color: #fff;
-  padding: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  flex: 1; /* Equal flex for both */
+.google-results-container,
+.metadata-container {
+  flex: 1 1 48%; /* Adjust containers to take up nearly equal space */
+  min-width: 48%; /* Ensure each container has a minimum width */
+  background-color: #ffffff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
+  box-sizing: border-box; /* Ensure padding does not affect the width */
 }
 
-.google-results {
-  margin-right: 20px; /* Adds space between metadata and results */
+.google-results-container:hover,
+.metadata-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
-.metadata {
-  margin-left: 20px; /* Adds space between metadata and results */
+.card {
+  background: linear-gradient(145deg, #ffffff, #e2e2e2);
+  padding: 25px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  color: #333;
 }
 
-.metadata h2,
-.google-results h2 {
-  color: #3c91e6;
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  color: #ff7e5f;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+h3 {
+  color: #333;
+  font-size: 1.4rem;
   margin-bottom: 10px;
+  font-weight: 600;
 }
 
-.metadata ul {
+p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+ul {
   list-style-type: none;
   padding-left: 0;
 }
 
-.metadata li {
-  margin-bottom: 8px;
+li {
+  margin-bottom: 10px;
 }
 
-.metadata li p {
+li p {
   margin: 0;
+  font-size: 1rem;
+  color: #777;
 }
 
-.metadata::after {
-  content: "";
-  display: block;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background-color: #ddd;
+.card a {
+  color: #ff7e5f;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.card a:hover {
+  color: #feb47b;
+  text-decoration: underline;
+}
+
+.metadata-container h4 {
+  color: #ff7e5f;
+  font-size: 1.2rem;
   margin-top: 20px;
 }
 
-.results-container .google-results {
-  border-right: 1px solid #ddd; /* Thin dividing line */
+.metadata-container div {
+  margin-top: 10px;
+}
+
+.metadata-container strong {
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .results-container {
+    flex-direction: column;
+  }
+
+  .google-results-container,
+  .metadata-container {
+    min-width: 100%;
+    margin-bottom: 20px;
+  }
 }

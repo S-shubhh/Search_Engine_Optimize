@@ -32,7 +32,6 @@ const App = () => {
       const googleData = await googleResponse.json();
       setGoogleResults(googleData.data || []);
       setShowResults(true);
-
     } catch (error) {
       console.error("Failed to fetch data:", error);
       alert("Failed to fetch data. Please try again.");
@@ -76,58 +75,53 @@ const App = () => {
       </div>
 
       <div className={`results-section ${showResults ? "visible" : ""}`}>
-        {googleResults.length > 0 && (
-          <div className="results-container">
-            <div className="google-results">
-              <h2>Related Sites</h2>
-              <ul>
+        <div className="results-container">
+          <div className="google-results-container">
+            {googleResults.length > 0 && (
+              <>
+                <h2>Google Search Results</h2>
                 {googleResults.map((result, index) => (
-                  <li key={index}>
+                  <div className="card" key={index}>
                     <a href={result.link} target="_blank" rel="noopener noreferrer">
                       <h3>{result.title}</h3>
                     </a>
                     <p>{result.snippet}</p>
-                  </li>
+                  </div>
                 ))}
-              </ul>
-            </div>
-
-            {metadata && (
-              <div className="metadata">
-                <h2>Metadata</h2>
-                <h3>{metadata.name}</h3>
-                <p>{metadata.address}</p>
-                <p>
-                  <strong>Why Famous:</strong> {metadata.whyFamous}
-                </p>
-                <h4>Nearby:</h4>
-                <ul>
-                  <li>
-                    <strong>Railway Station:</strong> {metadata.nearby.railwayStation.length
-                      ? metadata.nearby.railwayStation.map((station) => (
-                          <p key={station.name}>{station.name} - {station.distance}</p>
-                        ))
-                      : "N/A"}
-                  </li>
-                  <li>
-                    <strong>Bus Station:</strong> {metadata.nearby.busStation.length
-                      ? metadata.nearby.busStation.map((station) => (
-                          <p key={station.name}>{station.name} - {station.distance}</p>
-                        ))
-                      : "N/A"}
-                  </li>
-                  <li>
-                    <strong>Airport:</strong> {metadata.nearby.airport.length
-                      ? metadata.nearby.airport.map((airport) => (
-                          <p key={airport.name}>{airport.name} - {airport.distance}</p>
-                        ))
-                      : "N/A"}
-                  </li>
-                </ul>
-              </div>
+              </>
             )}
           </div>
-        )}
+
+          <div className="metadata-container">
+            {metadata && (
+              <>
+                <h2>Place Metadata</h2>
+                <div className="card">
+                  <h3>{metadata.name || "Unknown Place"}</h3>
+                  <p>{metadata.address || "Address not available"}</p>
+                  <p>
+                    <strong>Why Famous:</strong> {metadata.whyFamous || "No details available"}
+                  </p>
+                  <div>
+                    <h4>Nearby:</h4>
+                    {Object.entries(metadata.nearby).map(([key, value]) => (
+                      <div key={key}>
+                        <strong>{key.replace(/([A-Z])/g, " $1")}</strong>:{" "}
+                        {value.length
+                          ? value.map(({ name, distance }) => (
+                              <p key={name}>
+                                {name} - {distance}
+                              </p>
+                            ))
+                          : "N/A"}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
