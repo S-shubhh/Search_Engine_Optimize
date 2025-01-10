@@ -3,7 +3,7 @@ body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f8f9fa;
+  background: linear-gradient(to right, #f8f9fa, #f3f4f6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,8 +17,9 @@ body {
   align-items: center;
   padding: 30px;
   width: 100%;
-  max-width: 1200px;
-  box-sizing: border-box; /* Ensures padding doesn't affect overall width */
+  box-sizing: border-box;
+  max-width: 1800px; /* Increased the max width of the entire page */
+  
 }
 
 .search-container {
@@ -52,7 +53,7 @@ body {
   border-radius: 25px;
   outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  background: linear-gradient(to right, #ff7e5f, #feb47b); /* Gradient Background */
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
   color: white;
 }
 
@@ -76,6 +77,11 @@ body {
 .search-button:hover {
   background-color: #feb47b;
   transform: translateY(-3px);
+}
+
+.search-button:active {
+  box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
+  transform: translateY(2px);
 }
 
 .clear-button {
@@ -105,55 +111,57 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
-
 .results-container {
   display: flex;
   gap: 30px;
   width: 100%;
   justify-content: space-between;
   margin-top: 20px;
-  box-sizing: border-box; /* Ensure no margin issue */
+  box-sizing: border-box;
 }
 
-.google-results-container,
-.metadata-container {
-  flex: 1 1 48%; /* Adjust containers to take up nearly equal space */
-  min-width: 48%; /* Ensure each container has a minimum width */
+.google-results-container {
+  flex: 9; /* Increased flex value to give more space to the sites container */
   background-color: #ffffff;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border-radius: 20px;
+  padding: 30px;
   overflow: hidden;
-  box-sizing: border-box; /* Ensure padding does not affect the width */
+  box-sizing: border-box;
 }
 
-.google-results-container:hover,
-.metadata-container:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+.metadata-container {
+  flex: 2; /* Kept metadata container width larger but still smaller than the sites container */
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  box-sizing: border-box;
 }
 
 .card {
   background: linear-gradient(145deg, #ffffff, #e2e2e2);
-  padding: 25px;
-  margin-bottom: 20px;
+  padding: 20px; /* Reduced padding to make the card smaller */
+  margin-bottom: 15px; /* Reduced bottom margin to make them more compact */
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   color: #333;
+  max-height: 150px; /* Set a max height for each card to make them shorter */
+  overflow: hidden; 
+  
 }
 
 .card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+  transform: scale(1.02);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 h2 {
-  color: #ff7e5f;
   font-size: 1.8rem;
   margin-bottom: 20px;
   font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 h3 {
@@ -210,15 +218,21 @@ li p {
   font-weight: bold;
 }
 
+.metadata-section i {
+  color: #ff7e5f;
+  margin-right: 8px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .results-container {
     flex-direction: column;
+    gap: 10px;
   }
 
   .google-results-container,
   .metadata-container {
+    flex: 1;
     min-width: 100%;
-    margin-bottom: 20px;
   }
 }
