@@ -107,6 +107,7 @@ body {
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
+
 .results-section.visible {
   opacity: 1;
   transform: translateY(0);
@@ -129,30 +130,35 @@ body {
   box-sizing: border-box;
 }
 
-.metadata-container {
-  flex: 2; /* Kept metadata container width larger but still smaller than the sites container */
-  background-color: #ffffff;
-  border-radius: 20px;
-  padding: 30px;
-  box-sizing: border-box;
-}
 
 .card {
   background: linear-gradient(145deg, #ffffff, #e2e2e2);
-  padding: 20px; /* Reduced padding to make the card smaller */
-  margin-bottom: 15px; /* Reduced bottom margin to make them more compact */
+  padding: 20px; /* Maintained reduced padding for clean design */
+  margin-bottom: 15px; /* Reduced margin for compactness */
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   color: #333;
-  max-height: 150px; /* Set a max height for each card to make them shorter */
-  overflow: hidden; 
-  
+  height: auto; /* Automatically adjusts to content */
+  overflow: visible; /* Ensures no content is hidden */
 }
 
 .card p {
   white-space: normal;
+  word-wrap: break-word; /* Break long text into new lines */
+  line-height: 1.5; /* Improved readability */
 }
+
+.metadata-container {
+  flex: 2; /* Kept metadata container smaller than the sites container */
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  box-sizing: border-box;
+  max-height: none; /* Removed height restriction */
+  height: auto; /* Allows container to grow with content */
+}
+
 
 .card:hover {
   transform: scale(1.02);
@@ -216,6 +222,14 @@ li p {
 
 .metadata-container div {
   margin-top: 10px;
+  max-height: none; /* Ensure the inner cards dynamically fit their content */
+}
+
+.metadata-container p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 10px;
+  line-height: 1.5; /* Ensures content is easy to read */
 }
 
 .metadata-container strong {
