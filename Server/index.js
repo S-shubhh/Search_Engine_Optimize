@@ -135,7 +135,8 @@ app.get("/metadata", async (req, res) => {
     };
 
     // Step 4: Truncate "Why Famous" if necessary
-    const truncatedWhyFamous = whyFamous.length > 200 ? `${whyFamous.substring(0, 200)}...` : whyFamous;
+    const truncatedWhyFamous = whyFamous;
+
 
     res.json({
       message: "Metadata fetched successfully",
