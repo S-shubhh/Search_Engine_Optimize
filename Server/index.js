@@ -1,18 +1,18 @@
 require("dotenv").config();
-
 const express = require("express");
-const fs = require("fs");
+// const fs = require("fs");
 const crypto = require("crypto");
 const axios = require("axios");
 const cors = require("cors");
-
 const app = express();
 app.use(express.json());
 app.use(cors());
 
+
 // Load RSA private key from .env
 const privateKey = process.env.PRIVATE_KEY;
 const encodeQuery = (query) => encodeURIComponent(query).replace(/%20/g, "+");
+
 
 // Haversine formula to calculate distance between two lat-lng points
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -27,11 +27,19 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c; // Distance in km
 }
 
-// Endpoint: Decrypt encrypted queries
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+});
+
+
+
 app.post("/decrypt", (req, res) => {
   try {
     const { encryptedData } = req.body;
-
+f
     const decryptedBuffer = crypto.privateDecrypt(
       {
         key: privateKey,
@@ -58,10 +66,13 @@ app.get("/googleSearch", async (req, res) => {
     const apiKey = process.env.GOOGLE_SEARCH_API_KEY;
     const cx = process.env.GOOGLE_SEARCH_ENGINE_ID;
     const encodedQuery = encodeQuery(query);
+ 
 
     const response = await axios.get(
       `https://www.googleapis.com/customsearch/v1?q=${encodedQuery}&key=${apiKey}&cx=${cx}`
     );
+
+  
     const results = response.data.items.map((item) => ({
       title: item.title,
       link: item.link,
@@ -70,7 +81,11 @@ app.get("/googleSearch", async (req, res) => {
 
     res.json({ message: "Google search results fetched", data: results });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch Google search results", details: error.message });
+    console.error('Google Search Error:', error.response ? error.response.data : error.message);
+    res.status(500).json({
+      error: "Failed to fetch Google search results",
+      details: error.response ? error.response.data : error.message,
+    });
   }
 });
 
@@ -153,8 +168,13 @@ app.get("/metadata", async (req, res) => {
   }
 });
 
+
+app.use(limiter);
+
+
 // Start server
 const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+

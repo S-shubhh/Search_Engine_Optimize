@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import "./App.css";
+import { signInWithGoogle, signOutUser } from "./services/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -7,6 +10,23 @@ const App = () => {
   const [googleResults, setGoogleResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [user, setUser] = useState(null); // State for logged-in user
+
+  const auth = getAuth();
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        console.log("User is signed in:", currentUser);
+      } else {
+        setUser(null);
+        console.log("No user is signed in.");
+      }
+    });
+    return () => unsubscribe();
+  }, [auth]);
+
+
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
@@ -32,6 +52,11 @@ const App = () => {
       const googleData = await googleResponse.json();
       setGoogleResults(googleData.data || []);
       setShowResults(true);
+
+      
+        if (user) {
+          console.log("Search performed by user:", user.displayName);
+      }
     } catch (error) {
       console.error("Failed to fetch data:", error);
       alert("Failed to fetch data. Please try again.");
@@ -40,20 +65,43 @@ const App = () => {
     }
   };
 
-  // Function to capitalize the first letter of each word
   const capitalizeFirstLetter = (str) => {
     return str
       .split(" ")
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
-
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const loggedInUser = await signInWithGoogle();
+      if (loggedInUser) {
+        setUser(loggedInUser);
+        console.log("User logged in:", loggedInUser);
+      }
+    } catch (error) {
+      console.error("Error during Google login:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOutUser();
+      setUser(null);
+      setGoogleResults([]);
+      setMetadata(null);
+      alert("You have been logged out.");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+  
 
   return (
     <div className="app">
@@ -67,7 +115,6 @@ const App = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input"
             onKeyDown={handleKeyPress}
-
           />
           <button
             onClick={handleSearch}
@@ -78,6 +125,20 @@ const App = () => {
           </button>
         </div>
       </div>
+ {/* Authentication */} 
+      <div className="login-button">
+  {!user ? (
+    <button onClick={handleGoogleLogin} className="login-button">
+      Log in with Google
+    </button>
+  ) : (
+    <button onClick={handleLogout} className="logout-button">
+      Log out
+    </button>
+  )}
+</div>
+
+
 
       {/* Conditional Rendering for Results */}
       {showResults && (
@@ -100,7 +161,6 @@ const App = () => {
 
                         {/* Right side: Site Name, Link, and Description */}
                         <div className="result-info">
-                          {/* Site Name (Should show the name of the website, e.g., "Unacademy") */}
                           <h3 className="site-name">
                             <a
                               href={result.link}
@@ -110,8 +170,6 @@ const App = () => {
                               {result.title || "Website Name"}
                             </a>
                           </h3>
-
-                          {/* Site Link */}
                           <p className="site-link">
                             <a
                               href={result.link}
@@ -121,8 +179,6 @@ const App = () => {
                               {result.link}
                             </a>
                           </p>
-
-                          {/* Site Heading (Related Topic) */}
                           <h4 className="site-heading">
                             <a
                               href={result.link}
