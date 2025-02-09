@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 
-// Load RSA private key from .env
+
 const privateKey = process.env.PRIVATE_KEY;
 const encodeQuery = (query) => encodeURIComponent(query).replace(/%20/g, "+");
 
@@ -30,8 +30,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 const rateLimit = require("express-rate-limit");
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
 });
 
 
@@ -89,7 +89,7 @@ app.get("/googleSearch", async (req, res) => {
   }
 });
 
-// Endpoint: Fetch metadata from Google Places API
+
 app.get("/metadata", async (req, res) => {
   try {
     const { query } = req.query;
@@ -100,7 +100,7 @@ app.get("/metadata", async (req, res) => {
     const apiKey = process.env.GOOGLE_PLACES_API;
     const baseUrl = "https://maps.googleapis.com/maps/api/place/textsearch/json";
 
-    // Step 1: Fetch place details
+    
     const metadataResponse = await axios.get(`${baseUrl}?query=${encodeURIComponent(query)}&key=${apiKey}`);
     const place = metadataResponse.data.results[0];
 
@@ -112,14 +112,14 @@ app.get("/metadata", async (req, res) => {
     const lat = geometry.location.lat;
     const lng = geometry.location.lng;
 
-    // Step 2: Fetch detailed place information
+   
     const detailsResponse = await axios.get(
       `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${apiKey}`
     );
     const details = detailsResponse.data.result;
     const whyFamous = details.editorial_summary?.overview || "Details not available.";
 
-    // Step 3: Fetch nearby locations (train station, bus station, airport)
+    
     const types = ["train_station", "bus_station", "airport"];
     const nearbyPromises = types.map((type) =>
       axios.get(
@@ -149,7 +149,7 @@ app.get("/metadata", async (req, res) => {
         })) || [{ name: "No airports found nearby", address: "N/A", distance: "N/A" }],
     };
 
-    // Step 4: Truncate "Why Famous" if necessary
+    
     const truncatedWhyFamous = whyFamous;
 
 

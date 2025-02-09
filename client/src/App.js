@@ -10,8 +10,7 @@ const App = () => {
   const [googleResults, setGoogleResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [user, setUser] = useState(null); // State for logged-in user
-
+  const [user, setUser] = useState(null); 
   const auth = getAuth();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
