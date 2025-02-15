@@ -2,8 +2,7 @@ import React, { useState , useEffect } from "react";
 import "./App.css";
 import { signInWithGoogle, signOutUser } from "./services/auth";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-
-
+import CryptoJS from "crypto-js";
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [metadata, setMetadata] = useState(null);
@@ -26,35 +25,72 @@ const App = () => {
   }, [auth]);
 
 
+  const encryptionKey = process.env.REACT_APP_SECRET_KEY;
 
+  const encryptQuery = (query) => {
+    // Generate a random 16-byte IV
+    const iv = CryptoJS.lib.WordArray.random(16);
+  
+    // Hash the encryption key to 32 bytes
+    const keyHash = CryptoJS.SHA256(encryptionKey);
+  
+    // Encrypt the query
+    const encrypted = CryptoJS.AES.encrypt(query, keyHash, {
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+  
+    // Return IV and ciphertext
+    return {
+      iv: iv.toString(CryptoJS.enc.Base64),
+      ciphertext: encrypted.toString(),
+    };
+  };
+  
   const handleSearch = async () => {
+    console.log("handleSearch function triggered");
+  
     if (!searchQuery.trim()) {
       alert("Please enter a search query!");
       return;
     }
-
+  
     setLoading(true);
     setShowResults(false);
-
+  
     try {
-      // Fetch metadata
+      // Encrypt the search query
+      const encryptedQuery = encryptQuery(searchQuery);
+      console.log("Encrypted Query:", encryptedQuery);  // Debugging
+  
+      // Send encrypted query to backend for decryption
+      console.log("Sending encrypted query to backend:", encryptedQuery);
+      const response = await fetch("http://localhost:5000/decrypt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ encryptedQuery: encryptedQuery }),
+      });
+  
+      const decryptedData = await response.json();
+      console.log("Decrypted Query:", decryptedData.data);
+  
+      // Fetch metadata and Google search results using the decrypted query
       const metadataResponse = await fetch(
-        `http://localhost:5000/metadata?query=${encodeURIComponent(searchQuery)}`
+        `http://localhost:5000/metadata?query=${encodeURIComponent(decryptedData.data)}`
       );
       const metadataData = await metadataResponse.json();
       setMetadata(metadataData.data);
-
-      // Fetch Google search results
+  
       const googleResponse = await fetch(
-        `http://localhost:5000/googleSearch?query=${encodeURIComponent(searchQuery)}`
+        `http://localhost:5000/googleSearch?query=${encodeURIComponent(decryptedData.data)}`
       );
       const googleData = await googleResponse.json();
       setGoogleResults(googleData.data || []);
       setShowResults(true);
-
-      
-        if (user) {
-          console.log("Search performed by user:", user.displayName);
+  
+      if (user) {
+        console.log("Search performed by user:", user.displayName);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -63,6 +99,7 @@ const App = () => {
       setLoading(false);
     }
   };
+
 
   const capitalizeFirstLetter = (str) => {
     return str

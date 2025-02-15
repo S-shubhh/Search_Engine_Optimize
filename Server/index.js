@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-// const fs = require("fs");
 const crypto = require("crypto");
 const axios = require("axios");
 const cors = require("cors");
@@ -9,8 +8,6 @@ app.use(express.json());
 app.use(cors());
 
 
-
-const privateKey = process.env.PRIVATE_KEY;
 const encodeQuery = (query) => encodeURIComponent(query).replace(/%20/g, "+");
 
 
@@ -34,27 +31,44 @@ const limiter = rateLimit({
   max: 100, 
 });
 
+const encryptionKey = process.env.AES_SECRET_KEY; // Make sure this is a 32-byte key
+const iv = Buffer.alloc(16, 0); // AES requires a 16-byte IV, same as frontend
 
+
+function decryptQuery(encryptedData) {
+  // Extract IV and ciphertext
+  const iv = Buffer.from(encryptedData.iv, 'base64');
+  const ciphertext = Buffer.from(encryptedData.ciphertext, 'base64');
+
+  // Hash the encryption key to 32 bytes
+  const keyBuffer = crypto.createHash('sha256').update(encryptionKey).digest();
+
+  // Decrypt the ciphertext
+  const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuffer, iv);
+  let decrypted = decipher.update(ciphertext, null, 'utf8');
+  decrypted += decipher.final('utf8');
+
+  return decrypted;
+}
 
 app.post("/decrypt", (req, res) => {
   try {
-    const { encryptedData } = req.body;
-f
-    const decryptedBuffer = crypto.privateDecrypt(
-      {
-        key: privateKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        oaepHash: "sha256",
-      },
-      Buffer.from(encryptedData, "base64")
-    );
+    console.log("Received encryptedData:", req.body.encryptedQuery);
+    const { encryptedQuery } = req.body;
 
-    const decryptedData = decryptedBuffer.toString("utf8");
+    if (!encryptedQuery) {
+      return res.status(400).json({ error: "No encrypted data provided" });
+    }
+
+    const decryptedData = decryptQuery(encryptedQuery); // Call the function with encrypted data
     res.json({ message: "Decryption successful", data: decryptedData });
+
   } catch (error) {
+    console.error("Decryption error:", error.message);
     res.status(500).json({ error: "Decryption failed", details: error.message });
   }
 });
+
 
 app.get("/googleSearch", async (req, res) => {
   try {
